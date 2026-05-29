@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Transverse Wave & Phase Difference Simulation - إعداد الأستاذ أنور البلوشي</title>
+    <style>
+        :root {
+            --primary: #13253c;
+            --accent: #2980b9;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --btn-success: #27ae60;
+            --btn-danger: #e74c3c;
+            --btn-quiz: #f39c12;
+            --arrow-green: #27ae60;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 10px;
+        }
+
+        @media (min-width: 600px) { body { padding: 20px; } }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #0f1c2c, var(--primary));
+            color: white;
+            padding: 20px 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { font-size: 1.4rem; margin: 5px 0; }
+        @media (min-width: 600px) { header h1 { font-size: 1.8rem; } }
+
+        .teacher-credit { margin-top: 5px; font-size: 0.95rem; color: #f1c40f; font-weight: bold; }
+        @media (min-width: 600px) { .teacher-credit { font-size: 1.1rem; } }
+
+        .card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+            margin-bottom: 20px;
+        }
+        @media (min-width: 600px) { .card { padding: 25px; } }
+
+        .card h2 { font-size: 1.25rem; margin-top: 0; margin-bottom: 12px; color: var(--primary); }
+        .card p { font-size: 0.95rem; line-height: 1.6; color: #4a5568; margin-bottom: 15px; }
+
+        .controls-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #eef2f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+            border: 1px solid #dcdde1;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        label { font-weight: bold; margin-bottom: 6px; font-size: 0.85rem; color: #34495e; }
+        
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+            height: 8px;
+        }
+
+        .radio-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .radio-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 0.9rem;
+        }
+
+        input[type="radio"] {
+            accent-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .btn-action {
+            background-color: var(--btn-success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            min-height: 40px;
+            transition: 0.2s;
+        }
+        .btn-action:hover { opacity: 0.9; }
+
+        .live-status {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #2c3e50;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .live-status span { color: #f1c40f; }
+
+        .canvas-container {
+            position: relative;
+            background: #ffffff;
+            border: 2px solid #dcdde1;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        canvas { display: block; width: 100%; height: 260px; touch-action: none; }
+
+        .quiz-card { border-top-color: var(--btn-quiz); background-color: #fffdf6; }
+        .question-box {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border-right: 5px solid var(--btn-quiz);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .options-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-align: right;
+            transition: 0.2s;
+        }
+        .option-btn:hover:not([disabled]) { background: #f8fafc; border-color: #94a3b8; }
+        .option-btn.correct { background-color: var(--btn-success) !important; color: white; border-color: #27ae60; }
+        .option-btn.incorrect { background-color: var(--btn-danger) !important; color: white; border-color: #c0392b; }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: none;
+            line-height: 1.6;
+        }
+        .feedback-box.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .feedback-box.danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .btn-next {
+            background-color: var(--btn-quiz);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 1.05rem;
+        }
+        
+        .formula-text { color: #c0392b; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>مختبر فرق الطور التفاعلي المتكامل وبنك الأسئلة</h1>
+        <div class="teacher-credit">إعداد الأستاذ: أنور البلوشي (92818606)</div>
+    </header>
+
+    <div class="card">
+        <h2>1️⃣ فرق الطور بين جزيئين على نفس الموجة (التحكم في الطول الموجي والسعة اللحظية)</h2>
+        <p>حرك شريط تدوير الطول الموجي لترى تباعد وتداني جزيئات الوسط، وراقب اختفاء سهم السرعة تماماً عند القمم والقيعان (السكون اللحظي).</p>
+        
+        <div class="controls-panel">
+            <div class="control-group">
+                <label>➡️ اتجاه انتشار الموجة:</label>
+                <div class="radio-options">
+                    <label><input type="radio" name="waveDir1" value="right" checked> لليمين (▶)</label>
+                    <label><input type="radio" name="waveDir1" value="left"> لليسار (◀)</label>
+                </div>
+            </div>
+            <div class="control-group" style="flex: 1.5;">
+                <label id="wavelengthLabel1">📏 الطول الموجي للموجة (λ): 1.00 م</label>
+                <input type="range" id="wavelengthSlider1" min="0.5" max="2.5" step="0.05" value="1.00">
+            </div>
+            <div class="control-group">
+                <label>🐢 سرعة الحركة المحاكية:</label>
+                <select id="speedSelect1">
+                    <option value="0.03">سرعة طبيعية ⚡</option>
+                    <option value="0.01" selected>حركة بطيئة 🐢</option>
+                    <option value="0">إيقاف مؤقت ⏸</option>
+                </select>
+            </div>
+            <button class="btn-action" id="playBtn1">إيقاف مؤقت</button>
+        </div>
+
+        <div class="live-status">
+            <div>الانتشار الحالي: <span id="statusDir1">إلى اليمين</span></div>
+            <div>الطول الموجي (λ): <span id="lambdaVal1">1.00</span> م</div>
+            <div>موقع الجزيء A: <span id="posA">0.25</span> م</div>
+            <div>موقع الجزيء B: <span id="posB">0.75</span> م</div>
+            <div>المسافة الفاصلة (Δx): <span id="deltaXVal1">0.50</span> م</div>
+            <div>فرق الطور (الصغرى): <span id="phaseDiff1">180</span>°</div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas1"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2️⃣ فرق الطور ما بين موجتين كاملتين (تحكم بالإزاحة ورصد دقيق لـ Δx)</h2>
+        <p>الأسهم الخضراء المزدوجة توضح رصد قياس الإزاحة أفقياً <span style="color:var(--arrow-green); font-weight:bold;">(Δx)</span> في ثلاثة أماكن متناظرة (عند القمم، عند المركز، وعند القيعان).</p>
+        
+        <div class="controls-panel">
+            <div class="control-group">
+                <label>➡️ اتجاه انتشار الموجتين معاً:</label>
+                <div class="radio-options">
+                    <label><input type="radio" name="waveDir2" value="right" checked> لليمين (▶)</label>
+                    <label><input type="radio" name="waveDir2" value="left"> لليسار (◀)</label>
+                </div>
+            </div>
+            <div class="control-group" style="flex: 2;">
+                <label id="sliderLabel2">التحكم في إزاحة الموجة الثانية (Δx): 0.25 م</label>
+                <input type="range" id="shiftSlider2" min="0" max="1" step="0.01" value="0.25">
+            </div>
+            <div class="control-group">
+                <label>🐢 سرعة العرض:</label>
+                <select id="speedSelect2">
+                    <option value="0.03">سرعة طبيعية ⚡</option>
+                    <option value="0.01" selected>حركة بطيئة 🐢</option>
+                    <option value="0">إيقاف ⏸</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="live-status">
+            <div>الاتجاه الحالي: <span id="statusDir2">إلى اليمين</span></div>
+            <div>الطول الموجي الثابت (λ): <span>1.00</span> م</div>
+            <div>الإزاحة أفقياً (Δx): <span id="shiftVal2">0.25</span> م</div>
+            <div>فرق الطور الكلي: <span id="phaseDiff2">90</span>°</div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas2"></canvas>
+        </div>
+    </div>
+
+    <div class="card quiz-card">
+        <h2>🎯 بنك الأسئلة المطور لطلاب الصف 12 (مربوط بحركتك والاتجاه الحالي)</h2>
+        <div class="question-box" id="qText">انقر على الزر بالأسفل لتوليد سؤال ذكي يعتمد على التموضع والاتجاه الحالي للمختبر...</div>
+        <div class="options-list" id="optionsContainer"></div>
+        <div class="feedback-box" id="feedbackContainer"></div>
+        
+        <button class="btn-next" id="nextQuestionBtn">توليد تحدي جديد بناءً على المعطيات الحالية ↻</button>
+    </div>
+</div>
+
+<script>
+    const baseWavelength = 200; 
+    let wavelength1 = 200;      
+    const wavelength2 = 200;    
+    const amplitude = 60;
+    
+    let time1 = 0;
+    let time2 = 0;
+    let isPlaying1 = true;
+    let isPlaying2 = true;
+
+    const canvas1 = document.getElementById('canvas1');
+    const ctx1 = canvas1.getContext('2d');
+    let speed1 = 0.01;
+    let direction1 = 'right'; 
+    const ptA = { label: 'A', x: 50, color: '#e74c3c', radius: 10 };  
+    const ptB = { label: 'B', x: 150, color: '#3498db', radius: 10 }; 
+    let activePt = null;
+
+    const canvas2 = document.getElementById('canvas2');
+    const ctx2 = canvas2.getContext('2d');
+    let speed2 = 0.01;
+    let direction2 = 'right';
+    let waveShiftX = 50; 
+
+    function initCanvasSizes() {
+        canvas1.width = canvas1.parentElement.clientWidth;
+        canvas1.height = 260;
+        canvas2.width = canvas2.parentElement.clientWidth;
+        canvas2.height = 260;
+    }
+    initCanvasSizes();
+    window.addEventListener('resize', initCanvasSizes);
+
+    function getWaveY(x, t, shift = 0, dir = 'right', wl = 200) {
+        const centerY = 130;
+        const k = (2 * Math.PI) / wl;
+        const phase = (dir === 'right') ? (k * (x - shift) - t) : (k * (x - shift) + t);
+        return centerY - amplitude * Math.sin(phase);
+    }
+
+    function getVerticalVelocity(x, t, shift = 0, dir = 'right', wl = 200) {
+        const k = (2 * Math.PI) / wl;
+        const phase = (dir === 'right') ? (k * (x - shift) - t) : (k * (x - shift) + t);
+        const cosVal = Math.cos(phase);
+        return (dir === 'right') ? (amplitude * cosVal) : (-amplitude * cosVal);
+    }
+
+    // =======================================================
+    // 🎯 [التعديل الفني المقترح لتجنب الارتداد المفاجئ]:
+    // تم زيادة عتبة التسامح الحركي لضمان بقاء الجزيء ساكناً وبدون سهم بشكل واضح عند القمم
+    // =======================================================
+    function drawDirectionArrow(ctx, x, y, velocity, color) {
+        const absoluteVel = Math.abs(velocity);
+        
+        // توسيع العتبة البرمجية إلى 0.35 لمنح السهم وقتاً مرئياً للاختفاء التام عند القمم والقيعان
+        if (absoluteVel < 0.35) return; 
+
+        // معادلة متطابقة لتطويل وتقصير السهم بنعومة وسلاسة فائقة
+        const arrowLength = Math.max(6, Math.min(38, absoluteVel * 0.62));
+        const head = 6;
+        const dir = velocity > 0 ? -1 : 1; 
+        const arrowX = x + 18;
+
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.moveTo(arrowX, y);
+        ctx.lineTo(arrowX, y - arrowLength * dir);
+        ctx.lineTo(arrowX - head, y - (arrowLength - head) * dir);
+        ctx.moveTo(arrowX, y - arrowLength * dir);
+        ctx.lineTo(arrowX + head, y - (arrowLength - head) * dir);
+        ctx.stroke();
+    }
+
+    function drawWavePropagationArrow(ctx, width, dir) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#e67e22';
+        ctx.lineWidth = 3;
+        const arrowY = 35;
+        const arrowBaseX = width - 150;
+        const arrowTipX = width - 30;
+
+        if (dir === 'right') {
+            ctx.moveTo(arrowBaseX, arrowY); ctx.lineTo(arrowTipX, arrowY);
+            ctx.lineTo(arrowTipX - 10, arrowY - 6); ctx.moveTo(arrowTipX, arrowY); ctx.lineTo(arrowTipX - 10, arrowY + 6);
+            ctx.stroke();
+            ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 11px Segoe UI'; ctx.fillText('اتجاه انتشار الموجة (▶)', arrowBaseX, arrowY - 10);
+        } else {
+            ctx.moveTo(arrowTipX, arrowY); ctx.lineTo(arrowBaseX, arrowY);
+            ctx.lineTo(arrowBaseX + 10, arrowY - 6); ctx.moveTo(arrowBaseX, arrowY); ctx.lineTo(arrowBaseX + 10, arrowY + 6);
+            ctx.stroke();
+            ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 11px Segoe UI'; ctx.fillText('(◀) اتجاه انتشار الموجة', arrowBaseX, arrowY - 10);
+        }
+    }
+
+    function drawDeltaXArrow(ctx, startX, endX, y, labelText) {
+        if (Math.abs(endX - startX) < 5) return; 
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#27ae60';
+        ctx.lineWidth = 2;
+        ctx.moveTo(startX, y);
+        ctx.lineTo(endX, y);
+        
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = '#bdc3c7';
+        ctx.moveTo(startX, y - 10); ctx.lineTo(startX, y + 10);
+        ctx.moveTo(endX, y - 10); ctx.lineTo(endX, y + 10);
+        ctx.stroke();
+        ctx.setLineDash([]); 
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#27ae60';
+        const head = 5;
+        const arrowDir = endX > startX ? 1 : -1;
+        
+        ctx.moveTo(startX, y); ctx.lineTo(startX + head * arrowDir, y - head);
+        ctx.moveTo(startX, y); ctx.lineTo(startX + head * arrowDir, y + head);
+        ctx.moveTo(endX, y); ctx.lineTo(endX - head * arrowDir, y - head);
+        ctx.moveTo(endX, y); ctx.lineTo(endX - head * arrowDir, y + head);
+        ctx.stroke();
+
+        ctx.fillStyle = '#27ae60';
+        ctx.font = 'bold 13px Segoe UI';
+        const midX = (startX + endX) / 2;
+        ctx.fillText(labelText, midX - 10, y - 8);
+    }
+
+    function animate1() {
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+        const centerY = 130;
+
+        ctx1.beginPath();
+        ctx1.strokeStyle = '#cbd5e1';
+        ctx1.lineWidth = 1.5;
+        ctx1.moveTo(0, centerY);
+        ctx1.lineTo(canvas1.width, centerY);
+        ctx1.stroke();
+
+        drawWavePropagationArrow(ctx1, canvas1.width, direction1);
+
+        ctx1.beginPath();
+        ctx1.strokeStyle = '#94a3b8';
+        ctx1.lineWidth = 4;
+        for (let x = 0; x < canvas1.width; x++) {
+            const y = getWaveY(x, time1, 0, direction1, wavelength1);
+            if (x === 0) ctx1.moveTo(x, y);
+            else ctx1.lineTo(x, y);
+        }
+        ctx1.stroke();
+
+        [ptA, ptB].forEach(pt => {
+            const ptY = getWaveY(pt.x, time1, 0, direction1, wavelength1);
+            const vel = getVerticalVelocity(pt.x, time1, 0, direction1, wavelength1);
+
+            ctx1.beginPath();
+            ctx1.setLineDash([4, 4]);
+            ctx1.strokeStyle = '#e2e8f0';
+            ctx1.moveTo(pt.x, centerY - amplitude - 10);
+            ctx1.lineTo(pt.x, centerY + amplitude + 10);
+            ctx1.stroke();
+            ctx1.setLineDash([]);
+
+            drawDirectionArrow(ctx1, pt.x, ptY, vel, pt.color);
+
+            ctx1.beginPath();
+            ctx1.arc(pt.x, ptY, pt.radius, 0, Math.PI * 2);
+            ctx1.fillStyle = pt.color;
+            ctx1.fill();
+            ctx1.strokeStyle = '#ffffff';
+            ctx1.lineWidth = 2;
+            ctx1.stroke();
+
+            ctx1.fillStyle = '#1e293b';
+            ctx1.font = 'bold 15px Segoe UI';
+            ctx1.fillText(pt.label, pt.x - 5, ptY - 15);
+        });
+
+        const currentLambdaMeters = wavelength1 / baseWavelength;
+        const deltaXMeters = Math.abs(ptB.x - ptA.x) / baseWavelength;
+        const phaseDeg = Math.round(((Math.abs(ptB.x - ptA.x) / wavelength1) * 360) % 360);
+        
+        document.getElementById('posA').textContent = (ptA.x / baseWavelength).toFixed(2);
+        document.getElementById('posB').textContent = (ptB.x / baseWavelength).toFixed(2);
+        document.getElementById('deltaXVal1').textContent = deltaXMeters.toFixed(2);
+        document.getElementById('phaseDiff1').textContent = phaseDeg;
+
+        if (isPlaying1) time1 += speed1 * 4;
+        requestAnimationFrame(animate1);
+    }
+
+    function animate2() {
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+        const centerY = 130;
+
+        ctx2.beginPath();
+        ctx2.strokeStyle = '#cbd5e1';
+        ctx2.lineWidth = 1.5;
+        ctx2.moveTo(0, centerY);
+        ctx2.lineTo(canvas2.width, centerY);
+        ctx2.stroke();
+
+        drawWavePropagationArrow(ctx2, canvas2.width, direction2);
+
+        ctx2.beginPath();
+        ctx2.strokeStyle = 'rgba(231, 76, 60, 0.55)';
+        ctx2.lineWidth = 4;
+        for (let x = 0; x < canvas2.width; x++) {
+            const y = getWaveY(x, time2, 0, direction2, wavelength2);
+            if (x === 0) ctx2.moveTo(x, y);
+            else ctx2.lineTo(x, y);
+        }
+        ctx2.stroke();
+
+        ctx2.beginPath();
+        ctx2.strokeStyle = 'rgba(52, 152, 219, 0.65)';
+        ctx2.lineWidth = 4;
+        for (let x = 0; x < canvas2.width; x++) {
+            const y = getWaveY(x, time2, waveShiftX, direction2, wavelength2);
+            if (x === 0) ctx2.moveTo(x, y);
+            else ctx2.lineTo(x, y);
+        }
+        ctx2.stroke();
+
+        const basePeakX = (direction2 === 'right') ? ((time2 / (2*Math.PI/wavelength2) + wavelength2/4) % wavelength2) : ((-time2 / (2*Math.PI/wavelength2) + wavelength2/4) % wavelength2);
+        
+        const pos1_X1 = basePeakX + wavelength2; 
+        const pos1_X2 = pos1_X1 + waveShiftX;
+        drawDeltaXArrow(ctx2, pos1_X1, pos1_X2, centerY - amplitude - 5, 'Δx قمة');
+
+        const pos2_X1 = basePeakX + wavelength2 + wavelength2/4; 
+        const pos2_X2 = pos2_X1 + waveShiftX;
+        drawDeltaXArrow(ctx2, pos2_X1, pos2_X2, centerY, 'Δx مركز');
+
+        const pos3_X1 = basePeakX + wavelength2 + wavelength2/2; 
+        const pos3_X2 = pos3_X1 + waveShiftX;
+        drawDeltaXArrow(ctx2, pos3_X1, pos3_X2, centerY + amplitude + 12, 'Δx قاع');
+
+        if (isPlaying2) time2 += speed2 * 4;
+        requestAnimationFrame(animate2);
+    }
+
+    function getEventPos(e) {
+        const rect = canvas1.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDrag(e) {
+        const pos = getEventPos(e);
+        [ptA, ptB].forEach(pt => {
+            const ptY = getWaveY(pt.x, time1, 0, direction1, wavelength1);
+            const dist = Math.sqrt((pos.x - pt.x)**2 + (pos.y - ptY)**2);
+            if (dist < pt.radius + 15) { activePt = pt; if(e.cancelable) e.preventDefault(); }
+        });
+    }
+
+    function drag(e) {
+        if (!activePt) return;
+        const pos = getEventPos(e);
+        if (pos.x >= 10 && pos.x <= canvas1.width - 10) { activePt.x = pos.x; if(e.cancelable) e.preventDefault(); }
+    }
+
+    function endDrag() { activePt = null; }
+
+    canvas1.addEventListener('mousedown', startDrag);
+    canvas1.addEventListener('mousemove', drag);
+    window.addEventListener('mouseup', endDrag);
+    canvas1.addEventListener('touchstart', startDrag, { passive: false });
+    canvas1.addEventListener('touchmove', drag, { passive: false });
+    window.addEventListener('touchend', endDrag);
+
+    const wlSlider1 = document.getElementById('wavelengthSlider1');
+    wlSlider1.addEventListener('input', () => {
+        const val = parseFloat(wlSlider1.value);
+        wavelength1 = val * baseWavelength;
+        document.getElementById('wavelengthLabel1').textContent = `📏 الطول الموجي للموجة (λ): ${val.toFixed(2)} م`;
+        document.getElementById('lambdaVal1').textContent = val.toFixed(2);
+    });
+
+    document.querySelectorAll('input[name="waveDir1"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            direction1 = e.target.value;
+            document.getElementById('statusDir1').textContent = direction1 === 'right' ? 'إلى اليمين' : 'إلى اليسار';
+        });
+    });
+
+    document.querySelectorAll('input[name="waveDir2"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            direction2 = e.target.value;
+            document.getElementById('statusDir2').textContent = direction2 === 'right' ? 'إلى اليمين' : 'إلى اليسار';
+        });
+    });
+
+    document.getElementById('speedSelect1').addEventListener('change', (e) => {
+        speed1 = parseFloat(e.target.value); isPlaying1 = speed1 !== 0;
+    });
+    document.getElementById('playBtn1').addEventListener('click', () => {
+        isPlaying1 = !isPlaying1;
+        document.getElementById('playBtn1').textContent = isPlaying1 ? 'إيقاف مؤقت' : 'تشغيل الحركة';
+        if(isPlaying1 && speed1 === 0) { speed1 = 0.01; document.getElementById('speedSelect1').value = "0.01"; }
+    });
+
+    const slider2 = document.getElementById('shiftSlider2');
+    slider2.addEventListener('input', () => {
+        const val = parseFloat(slider2.value);
+        waveShiftX = val * wavelength2;
+        document.getElementById('sliderLabel2').textContent = `التحكم في إزاحة الموجة الثانية (Δx): ${val.toFixed(2)} م`;
+        document.getElementById('shiftVal2').textContent = val.toFixed(2);
+        document.getElementById('phaseDiff2').textContent = Math.round(val * 360);
+    });
+
+    document.getElementById('speedSelect2').addEventListener('change', (e) => {
+        speed2 = parseFloat(e.target.value); isPlaying2 = speed2 !== 0;
+    });
+
+    // =======================================================
+    // محرك الأسئلة التوليدي الذكي المتوازن
+    // =======================================================
+    let generatedQuestionData = {};
+
+    function generateDynamicQuestion() {
+        const questionTypes = ['particles', 'waves'];
+        const chosenType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+
+        let qText = '';
+        let possibleAnswers = [];
+        let correctAnswer = '';
+        let explanation = '';
+
+        if (chosenType === 'particles') {
+            const currentLambdaM = wavelength1 / baseWavelength;
+            const currentDeltaXM = Math.abs(ptB.x - ptA.x) / baseWavelength;
+            
+            const phaseMin = Math.round(((Math.abs(ptB.x - ptA.x) / wavelength1) * 360) % 360);
+            const phaseMax = phaseMin + 360;
+            const dirText = direction1 === 'right' ? 'إلى اليمين (▶)' : 'إلى اليسار (◀)';
+
+            qText = `بناءً على المعطيات الحالية في البرنامج الأول: الطول الموجي المسجل هو <span class="formula-text">λ = ${currentLambdaM.toFixed(2)} م</span>، والمسافة الأفقية بين الجزيئين هي <span class="formula-text">Δx = ${currentDeltaXM.toFixed(2)} م</span>، مع انتشار الموجة باتجاه <strong>${dirText}</strong>.<br><br>احسب قيمة زاوية فرق الطور الصغرى والتراكمية الكبرى معاً بالدرجات:`;
+            correctAnswer = `${phaseMin}° أو ${phaseMax}°`;
+            
+            const opt1 = `${phaseMin}° أو ${phaseMax}°`;
+            const opt2 = `${(phaseMin + 90) % 360}° أو ${(phaseMin + 90) % 360 + 360}°`;
+            const opt3 = `${Math.abs(phaseMin - 180)}° أو ${Math.abs(phaseMin - 180) + 360}°`;
+            possibleAnswers = [...new Set([opt1, opt2, opt3, '0° أو 360°'])].sort();
+
+            explanation = `<strong>طريقة الوصول للحل بالتفصيل بناءً على معطياتك:</strong><br>1. نطبق القانون الأساسي: $\\Delta\\Phi = \\frac{\\Delta x}{\\lambda} \\times 360^\\circ$.<br>2. بالتعويض بالقيم الحالية التي اخترتها للمختبر: $\\Delta\\Phi = \\frac{{${currentDeltaXM.toFixed(2)}}}{{${currentLambdaM.toFixed(2)}}} \\times 360^\\circ = ${phaseMin}^\\circ$.<br>3. القيمة التراكمية الدورية الكبرى تعادل دائماً: $${phaseMin}^\\circ + 360^\\circ = ${phaseMax}^\\circ$.`;
+
+        } else {
+            const currentShift = waveShiftX / wavelength2;
+            const phaseMin = Math.round(currentShift * 360);
+            const phaseMax = phaseMin + 360;
+            const dirText = direction2 === 'right' ? 'إلى اليمين (▶)' : 'إلى اليسار (◀)';
+
+            qText = `انظر لتداخل المنحنيين في البرنامج الثاني؛ حيث تظهر الأسهم الخضراء المزدوجة قيمة الإزاحة الأفقية $\\Delta x = ${currentShift.toFixed(2)}\\text{ m}$ والانتشار يمر باتجاه <strong>${dirText}</strong>.<br><br>كم تبلغ قيمة زاوية فرق الطور الكلي بين هاتين الموجتين؟`;
+            correctAnswer = `${phaseMin}° أو ${phaseMax}°`;
+
+            const opt1 = `${phaseMin}° أو ${phaseMax}°`;
+            const opt2 = `45° أو 405°`;
+            const opt3 = `180° أو 540°`;
+            possibleAnswers = [...new Set([opt1, opt2, opt3, '0° أو 360°'])];
+
+            explanation = `<strong>طريقة الوصول للحل:</strong><br>نطبق العلاقة للمنهج العماني بالدرجات: $\\Delta\\Phi = \\frac{\\Delta x}{\\lambda} \\times 360^\\circ$. الإزاحة الموضحة بالأسهم الخضراء هي $${currentShift.toFixed(2)}\\text{ m}$ والطول الموجي هو $1.00\\text{ m}$، بالتعويض المباشر نجد أن الزاوية الصغرى هي $${phaseMin}^\\circ$ والتراكمية الكبرى المقابلة للحالة الاهتزازية المكررة هي $${phaseMax}^\\circ$.`;
+        }
+
+        generatedQuestionData = { correctAnswer: correctAnswer, explanation: explanation };
+
+        document.getElementById('qText').innerHTML = qText;
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+        document.getElementById('feedbackContainer').style.display = 'none';
+
+        possibleAnswers.forEach(ans => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = ans;
+            btn.addEventListener('click', () => handleAnswerSelection(btn, ans));
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswerSelection(selectedBtn, chosenAns) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.innerText === generatedQuestionData.correctAnswer) btn.classList.add('correct');
+        });
+
+        const feedback = document.getElementById('feedbackContainer');
+        feedback.style.display = 'block';
+
+        if (chosenAns === generatedQuestionData.correctAnswer) {
+            feedback.className = 'feedback-box success';
+            feedback.innerHTML = `🎉 أحسنت صنعاً! إجابة صحيحة مئة بالمئة وتحليل ميكانيكي وبصري ممتاز وموفق.`;
+        } else {
+            selectedBtn.classList.add('incorrect');
+            feedback.className = 'feedback-box danger';
+            feedback.innerHTML = `❌ الإجابة تحتاج إلى مراجعة وتدقيق.<br><br> ${generatedQuestionData.explanation}`;
+        }
+    }
+
+    document.getElementById('nextQuestionBtn').addEventListener('click', generateDynamicQuestion);
+
+    animate1();
+    animate2();
+    generateDynamicQuestion();
+</script>
+
+</body>
+</html>
+�ت النتيجة اللحظية...';
+                document.getElementById('statusState').style.color = '#e67e22';
+                updateMovement();
+            }
+        }, 600);
+
+        document.getElementById('nextQuestionBtn').style.display = 'block';
+    }
+
+    // أزرار التحكم في التشغيل
+    document.getElementById('startBtn').addEventListener('click', () => {
+        frequency = parseFloat(document.getElementById('freqInput').value) || 0.5;
+        targetTime = parseFloat(document.getElementById('targetTimeInput').value) || 2.0;
+        waveDirection = document.querySelector('input[name="waveDir"]:checked').value;
+        timeStep = parseFloat(document.getElementById('speedSelect').value);
+
+        if (currentTime >= targetTime) { currentTime = 0; }
+
+        document.getElementById('statusFreq').textContent = frequency;
+        document.getElementById('statusTarget').textContent = targetTime.toFixed(1);
+        document.getElementById('statusDir').textContent = (waveDirection === 'right') ? 'إلى اليمين' : 'إلى اليسار';
+        document.getElementById('statusState').textContent = 'تهتز الآن...';
+        document.getElementById('statusState').style.color = '#f39c12';
+
+        if (!isRunning) {
+            isRunning = true;
+            updateMovement();
+        }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        isRunning = false;
+        cancelAnimationFrame(animationId);
+        currentTime = 0;
+        document.getElementById('statusTime').textContent = '0.00';
+        document.getElementById('statusState').textContent = 'متوقفة';
+        document.getElementById('statusState').style.color = '#e74c3c';
+        render();
+    });
+
+    document.getElementById('nextQuestionBtn').addEventListener('click', generateDynamicQuestion);
+
+    // ربط مستشعر تغيير أبعاد المتصفح لتعديل الواجهة فورياً عند تدوير الهاتف أو التابلت
+    window.addEventListener('resize', resizeCanvas);
+
+    // التشغيل الأولي
+    resizeCanvas();
+    generateDynamicQuestion();
+</script>
+
+</body>
+</html>
